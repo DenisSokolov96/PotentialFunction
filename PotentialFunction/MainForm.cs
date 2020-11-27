@@ -25,15 +25,18 @@ namespace PotentialFunction
     public partial class MainForm : Form
     {
         //список входных данных
-        public List<double[]> listVectors = new List<double[]>();
+        public static List<double[]> listVectors = new List<double[]>();
         //список тестовых данных
-        public List<double[]> listTestVectors = new List<double[]>();
-        //список куммулятивных потенциалов
-        public List<double> listK = new List<double>();
+        public static List<double[]> listTestVectors = new List<double[]>();
+        //список куммулятивных потенциалов для 3 и больше
+        public static List<double> listK = new List<double>();
         //список знаков
-        public List<int> listZn = new List<int>();
+        public static List<int> listZn = new List<int>();
         //список формул
-        public List<double> listFormuls = new List<double>();
+        public static List<double> listFormul = new List<double>();   
+        //классы
+        Deterministic deterministic = new Deterministic();
+        Stochastic stochastic = new Stochastic();
 
         /*##############################################################################*/
 
@@ -47,11 +50,12 @@ namespace PotentialFunction
             listVectors.Clear();
             listVectors = readFile();
             listZn.Clear();
-            listFormuls.Clear();
+            listFormul.Clear();
+            listK.Clear();
             //детерминированный
             if (trackBar1.Value == 0)
-            {
-                learning();
+            {                
+                richTextBox1.Text +=deterministic.learning();                
             }
             //стохастический
             else
@@ -68,8 +72,8 @@ namespace PotentialFunction
             listTestVectors = readFile();
             //детерминированный
             if (trackBar1.Value == 0)
-            {               
-                recognitionFile();                
+            {                
+                richTextBox1.Text += deterministic.recognitionFile();                
             }
             //стохастический
             else
@@ -89,8 +93,8 @@ namespace PotentialFunction
             {                
                 listTestVectors.Add(parsToInt("0 " + textBox1.Text.ToString()));
                 if (listTestVectors[0].Length - 1 < 3)
-                    recognitionFile();
-                else recognitionFileV3();
+                    richTextBox1.Text += deterministic.recognitionFile();
+                else richTextBox1.Text += deterministic.recognitionFileV3();
             }
             //стохастический
             else
@@ -99,115 +103,7 @@ namespace PotentialFunction
             }
             richTextBox1.Text += "Распознавание завершено.\n";
         }
-
-        /*                                      2                                       */
-        /*##############################################################################*/
-
-        private void learning()
-        {
-            int check = 0;
-            int epoch = 1;
-
-            //Первый шаг
-            if (listVectors[0][0] == 1)
-                listZn.Add(1);
-            else listZn.Add(-1);
-
-            for (int i = 1; i < listVectors[0].Length; i++)
-                listFormuls.Add(listVectors[0][i]);
-
-            int iVector = 1;
-            //Следующие шаги
-            while ((check < listVectors.Count()) && (listVectors.Count() > 1))
-            {
-                double K = funcK(iVector, listVectors);
-
-                if ((K > 0) && (listVectors[iVector][0] == 1.0))
-                {
-                    check++;
-                }
-                if ((K < 0) && (listVectors[iVector][0] == 2.0))
-                {
-                    check++;
-                }
-                if ((K <= 0) && (listVectors[iVector][0] == 1.0))
-                {
-                    check = 0;
-                    listZn.Add(1);
-                    for (int i = 1; i < listVectors[iVector].Length; i++)
-                        listFormuls.Add(listVectors[iVector][i]);
-                }
-                if ((K >= 0) && (listVectors[iVector][0] == 2.0))
-                {
-                    check = 0;
-                    listZn.Add(-1);
-                    for (int i = 1; i < listVectors[iVector].Length; i++)
-                        listFormuls.Add(listVectors[iVector][i]);
-                }
-
-                //проверка, дошли ли мы до конца
-                if (iVector == listVectors.Count - 1)
-                {
-                    iVector = 0;
-                }
-                else iVector++;
-
-                listK.Add(K);// можно убрать                
-                epoch++;
-            }
-            richTextBox1.Text += "Кол-во итераций обучения: " + epoch.ToString() + "\n";
-        }
-
-        private double funcK(int iVector, List<double[]> list)
-        {
-            double k = 0;
-            for (int iExp = 0; iExp < listZn.Count(); iExp++)
-            {
-                double exp = 0;
-                for (int j = 1; j < list[iVector].Length; j++)
-                {
-                    int a = iExp * (list[iVector].Length - 1);
-                    exp += Math.Pow(list[iVector][j] - listFormuls[a + j - 1], 2);
-                }
-                k += Math.Exp(-exp) * listZn[iExp];
-            }
-            return k;
-        }
-
-        private void recognitionFile()
-        {
-            for (int iVector = 0; iVector < listTestVectors.Count; iVector++)
-            {
-                double k = funcK(iVector, listTestVectors);
-
-                if (k < 0) richTextBox1.Text += "2:   ";
-                else richTextBox1.Text += "1:  ";
-
-                for (int i = 1; i < listTestVectors[iVector].Length; i++)
-                    richTextBox1.Text += listTestVectors[iVector][i].ToString() + "   ";
-                richTextBox1.Text += "\n";
-            }
-        }
-
-        /*                        3 и больше                                            */
-        /*##############################################################################*/
-
-        private void recognitionFileV3()
-        {
-            List<double> listK = new List<double>();
-            for (int iVector = 0; iVector < listTestVectors.Count; iVector++)
-            {
-                double k = funcK(iVector, listTestVectors);
-
-                if (k < 0) richTextBox1.Text += "2:   ";
-                else richTextBox1.Text += "1:  ";
-
-                for (int i = 1; i < listTestVectors[iVector].Length; i++)
-                    richTextBox1.Text += listTestVectors[iVector][i].ToString() + "   ";
-                richTextBox1.Text += "\n";
-            }
-        }
-
+        
         /*##############################################################################*/
 
         private List<double[]> readFile()
