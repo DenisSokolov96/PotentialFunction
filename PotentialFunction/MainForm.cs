@@ -28,8 +28,10 @@ namespace PotentialFunction
         public static List<double[]> listVectors = new List<double[]>();
         //список тестовых данных
         public static List<double[]> listTestVectors = new List<double[]>();
-        //список куммулятивных потенциалов для 3 и больше
-        public static List<double> listK = new List<double>();
+        //список формул для 3 и больше
+        public static List<List<double>> listFormuls = new List<List<double>>();
+        //список корректировки формул
+        public static List<int> listKorrect = new List<int>();
         //список знаков
         public static List<int> listZn = new List<int>();
         //список формул
@@ -51,11 +53,23 @@ namespace PotentialFunction
             listVectors = readFile();
             listZn.Clear();
             listFormul.Clear();
-            listK.Clear();
+            listFormuls.Clear();
+            listKorrect.Clear();
             //детерминированный
             if (trackBar1.Value == 0)
-            {                
-                richTextBox1.Text +=deterministic.learning();                
+            {
+                int a = countClass();
+                for (int i = 0; i < a; i++)
+                    listKorrect.Add(0);
+                if (a < 3)
+                    richTextBox1.Text += deterministic.learning();
+                else
+                {
+                    for (int i = 0; i < a; i++)
+                        listFormuls.Add(new List<double>());
+
+                    richTextBox1.Text += deterministic.learningCl3();
+                }
             }
             //стохастический
             else
@@ -72,8 +86,35 @@ namespace PotentialFunction
             listTestVectors = readFile();
             //детерминированный
             if (trackBar1.Value == 0)
-            {                
-                richTextBox1.Text += deterministic.recognitionFile();                
+            {
+                int a = countClass();
+                if (a < 3)
+                {
+                    List<string> str = new List<string>();
+                    str = deterministic.recognitionFile();
+                    //сортировочный вывод
+                    for (int iClass = 0; iClass < a; iClass++)
+                        for (int i = 0; i < str.Count; i++)
+                        {
+                            string[] mas = str[i].Split(':');
+                            if (Convert.ToInt32(mas[0]) == iClass + 1)
+                                richTextBox1.Text += str[i];
+                        }
+                }
+                else
+                {
+                    List<string> str = new List<string>();
+                    str = deterministic.recognitionFileV3();
+                    //сортировочный вывод
+                    for (int iClass = 0; iClass < a; iClass++)
+                        for (int i = 0; i < str.Count; i++)
+                        {
+                            string[] mas = str[i].Split(':');
+                            if (Convert.ToInt32(mas[0]) == iClass + 1)
+                                richTextBox1.Text += str[i];
+                        }
+
+                }
             }
             //стохастический
             else
@@ -92,9 +133,9 @@ namespace PotentialFunction
             if (trackBar1.Value == 0)
             {                
                 listTestVectors.Add(parsToInt("0 " + textBox1.Text.ToString()));
-                if (listTestVectors[0].Length - 1 < 3)
-                    richTextBox1.Text += deterministic.recognitionFile();
-                else richTextBox1.Text += deterministic.recognitionFileV3();
+                if (countClass() < 3)
+                    richTextBox1.Text += deterministic.recognitionFile()[0];
+                else richTextBox1.Text += deterministic.recognitionFileV3()[0];
             }
             //стохастический
             else
@@ -103,7 +144,18 @@ namespace PotentialFunction
             }
             richTextBox1.Text += "Распознавание завершено.\n";
         }
-        
+
+        /*##############################################################################*/
+
+        private int countClass()
+        {
+            List<double> list = new List<double>();
+            foreach (double[] val in listVectors)
+                list.Add(val[0]);
+
+            return list.Distinct().Count();            
+        }
+
         /*##############################################################################*/
 
         private List<double[]> readFile()
