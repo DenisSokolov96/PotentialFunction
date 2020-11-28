@@ -14,7 +14,7 @@ namespace PotentialFunction
 
         public string learning()
         {            
-            int check = 0;
+            int check = 1;
             int epoch = 1;
             int corFormul = 0;
 
@@ -125,7 +125,11 @@ namespace PotentialFunction
 
         private string learningClass(int iClass)
         {
-            int check = 0;
+            int[] mas = new int[MainForm.listFormuls.Count()];
+            for (int i = 0; i < MainForm.listVectors.Count(); i++)
+                mas[(int)MainForm.listVectors[i][0] - 1]++;
+
+            int check = 1;
             int epoch = 1;
             if (MainForm.listFormuls[iClass - 1].Count == 0)
             {
@@ -137,9 +141,9 @@ namespace PotentialFunction
                 for (int i = 1; i < MainForm.listVectors[0].Length; i++)
                     MainForm.listFormuls[iClass - 1].Add(MainForm.listVectors[iVectorCl][i]);
             }
-            int iVector = 0;
+            int iVector = 1;
             //Следующие шаги
-            while ((check < MainForm.listVectors.Count()) && (MainForm.listVectors.Count() > 1))
+            while ((check < mas[iClass-1]) && (MainForm.listVectors.Count() > 1))
             {                
                 //поиск вектора для iClas класса
                 while ((iVector < MainForm.listVectors.Count()) && (MainForm.listVectors[iVector][0] != iClass))

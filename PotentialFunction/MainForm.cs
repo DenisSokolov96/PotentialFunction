@@ -33,7 +33,7 @@ namespace PotentialFunction
         //список корректировки формул
         public static List<int> listKorrect = new List<int>();
         //список знаков
-        public static List<int> listZn = new List<int>();
+        public static List<double> listZn = new List<double>();
         //список формул
         public static List<double> listFormul = new List<double>();   
         //классы
@@ -74,7 +74,18 @@ namespace PotentialFunction
             //стохастический
             else
             {
+                int a = countClass();
+                for (int i = 0; i < a; i++)
+                    listKorrect.Add(0);
+                if (a < 3)
+                    richTextBox1.Text += stochastic.learning();
+                else
+                {
+                    for (int i = 0; i < a; i++)
+                        listFormuls.Add(new List<double>());
 
+                    richTextBox1.Text += stochastic.learningCl3();
+                }
             }
 
             richTextBox1.Text += "Обучение завершено.\n";
@@ -119,7 +130,34 @@ namespace PotentialFunction
             //стохастический
             else
             {
+                int a = countClass();
+                if (a < 3)
+                {
+                    List<string> str = new List<string>();
+                    str = stochastic.recognitionFile();
+                    //сортировочный вывод
+                    for (int iClass = 0; iClass < a; iClass++)
+                        for (int i = 0; i < str.Count; i++)
+                        {
+                            string[] mas = str[i].Split(':');
+                            if (Convert.ToInt32(mas[0]) == iClass + 1)
+                                richTextBox1.Text += str[i];
+                        }
+                }
+                else
+                {
+                    List<string> str = new List<string>();
+                    str = stochastic.recognitionFileV3();
+                    //сортировочный вывод
+                    for (int iClass = 0; iClass < a; iClass++)
+                        for (int i = 0; i < str.Count; i++)
+                        {
+                            string[] mas = str[i].Split(':');
+                            if (Convert.ToInt32(mas[0]) == iClass + 1)
+                                richTextBox1.Text += str[i];
+                        }
 
+                }
             }
 
             richTextBox1.Text += "Распознавание завершено.\n";
@@ -140,7 +178,10 @@ namespace PotentialFunction
             //стохастический
             else
             {
-
+                listTestVectors.Add(parsToInt("0 " + textBox1.Text.ToString()));
+                if (countClass() < 3)
+                    richTextBox1.Text += stochastic.recognitionFile()[0];
+                else richTextBox1.Text += stochastic.recognitionFileV3()[0];
             }
             richTextBox1.Text += "Распознавание завершено.\n";
         }
