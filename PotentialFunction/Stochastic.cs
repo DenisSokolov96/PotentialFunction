@@ -8,106 +8,6 @@ namespace PotentialFunction
 {
     class Stochastic
     {
-        /*                                      2                                       */
-        /*##############################################################################*/
-
-        public string learning()
-        {
-            int check = 1;
-            int epoch = 1;
-            int corFormul = 0;
-
-            //Первый шаг
-            MainForm.listZn.Add(1.0);
-
-            for (int i = 1; i < MainForm.listVectors[0].Length; i++)
-                MainForm.listFormul.Add(MainForm.listVectors[0][i]);
-
-            int iVector = 1;
-            //Следующие шаги
-            while ((check < MainForm.listVectors.Count()) && (MainForm.listVectors.Count() > 1))
-            {
-                double K = funcK(iVector, MainForm.listVectors);
-
-                if ((K > 0) && (MainForm.listVectors[iVector][0] == 1.0))
-                {
-                    check++;                    
-                }
-                if ((K < 0) && (MainForm.listVectors[iVector][0] == 2.0))
-                {
-                    check++;
-                }
-                if ((K <= 0) && (MainForm.listVectors[iVector][0] == 1.0))
-                {
-                    check = 0;
-                    for (int i = 1; i < MainForm.listVectors[iVector].Length; i++)
-                        MainForm.listFormul.Add(MainForm.listVectors[iVector][i]);
-                    corFormul++;
-                    MainForm.listKorrect[0]++;
-                }
-                if ((K >= 0) && (MainForm.listVectors[iVector][0] == 2.0))
-                {
-                    check = 0;
-                    for (int i = 1; i < MainForm.listVectors[iVector].Length; i++)
-                        MainForm.listFormul.Add(MainForm.listVectors[iVector][i]);
-                    corFormul++;
-                    MainForm.listKorrect[1]++;
-                }
-                //проверка, дошли ли мы до конца
-                if (iVector == MainForm.listVectors.Count - 1)
-                {
-                    iVector = 0;
-                }
-                else
-                {
-                    MainForm.listZn[0] = MainForm.listZn[0] / 2.0;
-                    iVector++;
-                }
-                epoch++;
-            }
-
-            string str = "";
-            str += "Корректировка для 1: " + MainForm.listKorrect[0].ToString() + "\n";
-            str += "Корректировка для 2: " + MainForm.listKorrect[1].ToString() + "\n";
-            str += "Кол-во корректировок формулы: " + corFormul.ToString() + "\n" + "Кол-во итераций обучения: " + epoch + "\n";
-            return str;
-        }
-
-        private double funcK(int iVector, List<double[]> list)
-        {
-            double k = 0;
-            for (int iExp = 0; iExp < MainForm.listFormuls.Count()/2; iExp++)
-            {
-                double exp = 0;
-                for (int j = 1; j < list[iVector].Length; j++)
-                {
-                    int a = iExp * (list[iVector].Length - 1);
-                    exp += Math.Pow(list[iVector][j] - MainForm.listFormul[a + j - 1], 2);
-                }
-                k += Math.Exp(-exp) * MainForm.listZn[0];
-            }
-            return k;
-        }
-
-        public List<string> recognitionFile()
-        {
-            List<string> text = new List<string>();
-            for (int iVector = 0; iVector < MainForm.listTestVectors.Count; iVector++)
-            {
-                string str = "";
-                double k = funcK(iVector, MainForm.listTestVectors);
-
-                if (k < 0) str += "2:   ";
-                else str += "1:  ";
-
-                for (int i = 1; i < MainForm.listTestVectors[iVector].Length; i++)
-                    str += MainForm.listTestVectors[iVector][i].ToString() + "   ";
-                str += "\n";
-                text.Add(str);
-            }
-            return text;
-        }
-
         /*                        3 и более                                            */
         /*##############################################################################*/
 
@@ -140,6 +40,9 @@ namespace PotentialFunction
                     MainForm.listFormuls[iClass - 1].Add(MainForm.listVectors[iVectorCl][i]);
             }
             int iVector = 1;
+            /************/
+            int z = 1;
+            /************/
             //Следующие шаги
             while ((check < mas[iClass-1]) && (MainForm.listVectors.Count() > 1))
             {
@@ -149,15 +52,16 @@ namespace PotentialFunction
                 if (iVector >= MainForm.listVectors.Count()) iVector = 0;
 
                 double K = funcKV3(iVector, iClass, MainForm.listVectors);
-                MainForm.listZn[0] = MainForm.listZn[0] / 2.0;
-
+                
                 if (K > 0) check++;
                 if (K <= 0)
                 {
                     check = 0;
                     for (int i = 1; i < MainForm.listVectors[iVector].Length; i++)
                         MainForm.listFormuls[iClass - 1].Add(MainForm.listVectors[iVector][i]);
-                    MainForm.listKorrect[iClass--]++;
+                    MainForm.listKorrect[iClass - 1]++;
+                    z++;
+                    MainForm.listZn[0] = 1 / z;
                 }
 
                 //проверка, дошли ли мы до конца
@@ -165,14 +69,14 @@ namespace PotentialFunction
                 {
                     iVector = 0;
                 }
-                else iVector++;
-
-                epoch++;
+                else { iVector++;}
+                epoch++;               
+                
             }
 
             string str = "";
-            str += "Корректировка для " + iClass.ToString() + ": " + MainForm.listKorrect[iClass - 1].ToString() + "\n";
-            str += "Кол-во итераций обучения для " + iClass.ToString() + ": " + epoch + "\n";
+            str += "Корректировка для " + iClass.ToString() + "кл.: " + MainForm.listKorrect[iClass - 1].ToString() + "\n";
+            str += "Кол-во итераций обучения для " + iClass.ToString() + "кл.: " + epoch + "\n";
             return str;
         }
 

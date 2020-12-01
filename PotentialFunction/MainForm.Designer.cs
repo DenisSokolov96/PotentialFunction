@@ -117,11 +117,12 @@
             // 
             this.trackBar1.LargeChange = 1;
             this.trackBar1.Location = new System.Drawing.Point(594, 175);
-            this.trackBar1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.trackBar1.Margin = new System.Windows.Forms.Padding(2);
             this.trackBar1.Maximum = 1;
             this.trackBar1.Name = "trackBar1";
             this.trackBar1.Size = new System.Drawing.Size(160, 45);
             this.trackBar1.TabIndex = 2;
+            this.trackBar1.Value = 1;
             // 
             // label3
             // 
