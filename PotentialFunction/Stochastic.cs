@@ -61,7 +61,7 @@ namespace PotentialFunction
                         MainForm.listFormuls[iClass - 1].Add(MainForm.listVectors[iVector][i]);
                     MainForm.listKorrect[iClass - 1]++;
                     z++;
-                    MainForm.listZn[0] = 1 / z;
+                    MainForm.listZn.Add(1 / (iVector+1));
                 }
 
                 //проверка, дошли ли мы до конца
@@ -75,7 +75,7 @@ namespace PotentialFunction
             }
 
             string str = "";
-            str += "Корректировка для " + iClass.ToString() + "кл.: " + MainForm.listKorrect[iClass - 1].ToString() + "\n";
+            //str += "Корректировка для " + iClass.ToString() + "кл.: " + MainForm.listKorrect[iClass - 1].ToString() + "\n";
             str += "Кол-во итераций обучения для " + iClass.ToString() + "кл.: " + epoch + "\n";
             return str;
         }
@@ -91,7 +91,7 @@ namespace PotentialFunction
                     int a = iExp * (list[iVector].Length - 1);
                     exp += Math.Pow(list[iVector][j] - MainForm.listFormuls[iClass - 1][a + j - 1], 2);
                 }
-                k += Math.Exp(-exp) * MainForm.listZn[0];
+                k += Math.Exp(-exp) * MainForm.listZn[iExp];
             }
             return k;
         }

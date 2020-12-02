@@ -172,7 +172,7 @@ namespace PotentialFunction
             }
 
             string str = "";
-            str += "Корректировка для " + iClass.ToString() + ": " + MainForm.listKorrect[iClass-1].ToString() + "\n";            
+            //str += "Корректировка для " + iClass.ToString() + ": " + MainForm.listKorrect[iClass-1].ToString() + "\n";            
             str += "Кол-во итераций обучения для " + iClass.ToString() + ": " + epoch + "\n";
             return str;
         }
